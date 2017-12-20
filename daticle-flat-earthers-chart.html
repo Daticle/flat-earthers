@@ -1,0 +1,196 @@
+<dom-module id="daticle-flat-earthers-chart">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      svg {
+        display: block;
+        margin: 0 auto;
+      }
+
+      #hoverPanel {
+        position: absolute;
+        background: white;
+        padding: 8px;
+        border: 1px solid #d8d8d8;
+        border-radius: 3px;
+        font-size: 11px;
+        width: 150px;
+        font-family: sans-serif;
+        font-weight: 400;
+        background: #f0f0fa;
+      }
+
+      #container {
+        margin: 50px auto 0;
+        position: relative;
+      }
+    </style>
+    <div id="container">
+      <svg id="svg"></svg>
+      <div id="hoverPanel" style="display: none;">[[message]]</div>
+    </div>
+  </template>
+  <script src="d3.v4.min.js"></script>
+  <script>
+    class DFEChart extends Polymer.Element {
+      static get is() { return 'daticle-flat-earthers-chart'; }
+      static get properties() {
+        return {
+          message: String
+        };
+      }
+
+      constructor() {
+        super();
+        this._resizeListener = this._onResize.bind(this);
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        this.svg = this.$.svg;
+        setTimeout(() => {
+          this._refresh();
+        });
+        window.removeEventListener("resize", this._resizeListener);
+        window.addEventListener("resize", this._resizeListener);
+      }
+
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        window.removeEventListener("resize", this._resizeListener);
+      }
+
+      _onResize() {
+        if (this._resizing) {
+          return;
+        }
+        this._resizing = true;
+        setTimeout(() => {
+          this._resizing = false;
+          this._refresh();
+        }, 800);
+      }
+
+      _clearNode(node) {
+        while (node.hasChildNodes()) {
+          node.removeChild(node.lastChild);
+        }
+      }
+
+      _refresh() {
+        this._clearNode(this.svg);
+
+        this._w = Math.min(window.innerWidth, 960);
+        this._h = Math.max(300, this._w * 0.521);
+
+        this.$.container.style.width = this._w + "px";
+        var svg = d3.select(this.svg);
+        svg.attr("width", this._w).attr("height", this._h);
+        var margin = { top: 20, right: 20, bottom: this._w > 500 ? 30 : 50, left: 30 },
+          width = this._w - margin.left - margin.right,
+          height = this._h - margin.top - margin.bottom,
+          g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        var parseTime = d3.timeParse("%Y-%m-%d");
+
+        var x = d3.scaleTime()
+          .rangeRound([0, width]);
+
+        var y = d3.scaleLinear()
+          .rangeRound([height, 0]);
+
+        var line = d3.line()
+          .x(function (d) { return x(d.date); })
+          .y(function (d) { return y(d.score); });
+
+        let dataCallback = (error, data) => {
+          if (error) {
+            console.error(error);
+            throw error;
+          }
+          this._csvData = data;
+          x.domain(d3.extent(data, function (d) { return d.date; }));
+          y.domain(d3.extent(data, function (d) { return d.score; }));
+          let xAxis = g.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%b,%y")));
+          if (this._w <= 500) {
+            xAxis.selectAll("text")
+              .style("text-anchor", "end")
+              .attr("dx", "-.8em")
+              .attr("dy", ".15em")
+              .attr("transform", "rotate(-65)");
+          }
+
+          g.append("g")
+            .call(d3.axisLeft(y))
+            .append("text")
+            .attr("fill", "#000")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", "0.71em")
+            .attr("text-anchor", "end")
+            .text("Interest level");
+          g.append("path")
+            .datum(data)
+            .attr("fill", "none")
+            .attr("stroke", "steelblue")
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-linecap", "round")
+            .attr("stroke-width", 1.5)
+            .attr("d", line);
+
+          g.append("g").selectAll("circle").data(this._noted).enter()
+            .append("circle")
+            .attr("x", 0).attr("y", 0)
+            .attr("r", 10)
+            .attr("transform", (d) => {
+              return "translate(" + x(d.date) + "," + y(d.score) + ")";
+            }).attr("fill", "orange")
+            .on("mouseover", (d) => {
+              this.message = d.note;
+              let style = this.$.hoverPanel.style;
+              style.display = "block";
+              let left = x(d.date);
+              if ((left + 168) >= window.innerWidth) {
+                left = window.innerWidth - 171;
+              }
+              style.left = left + "px";
+              style.top = y(d.score) - 50 + "px";
+            })
+            .on("click", (d) => {
+              this.message = d.note;
+              let style = this.$.hoverPanel.style;
+              style.display = "block";
+              let left = x(d.date);
+              if ((left + 168) >= window.innerWidth) {
+                left = window.innerWidth - 171;
+              }
+              style.left = left + "px";
+              style.top = y(d.score) - 50 + "px";
+            })
+            .on("mouseout", () => {
+              this.$.hoverPanel.style.display = "none";
+            });
+        };
+
+        if (this._csvData) {
+          dataCallback(null, this._csvData);
+        } else {
+          this._noted = [];
+          d3.csv(this.resolveUrl('data.csv'), (d) => {
+            d.date = parseTime(d.date);
+            d.score = +d.score;
+            if (d.note) {
+              this._noted.push(d);
+            }
+            return d;
+          }, dataCallback);
+        }
+      }
+    }
+    window.customElements.define(DFEChart.is, DFEChart);
+  </script>
+</dom-module>

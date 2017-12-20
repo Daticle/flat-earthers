@@ -1,0 +1,128 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="daticle-flat-earthers-chart.html">
+
+<dom-module id="daticle-flat-earthers">
+  <template>
+    <style>
+      :host {
+        display: block;
+        font-family: 'Open Sans', sans-serif;
+        font-weight: 400;
+        line-height: 1.5;
+        font-size: 18px;
+        color: #292929;
+        -webkit-font-smoothing: antialiased;
+        padding: 20px 0;
+      }
+
+      figure {
+        margin: 20px 0 50px;
+      }
+
+      figcaption {
+        max-width: 650px;
+        margin: 0 auto;
+        font-size: 14px;
+        text-align: center;
+        padding: 10px 15px;
+      }
+
+      header,
+      section {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 0 12px;
+      }
+
+      h1 {
+        font-family: 'Raleway', sans-serif;
+        margin: 0;
+        font-weight: 400;
+        line-height: 1.4;
+        font-size: 36px;
+        text-transform: capitalize;
+      }
+
+      a,
+      a:visited,
+      a:hover {
+        color: #2E7D32;
+        outline: none;
+        text-decoration: none;
+      }
+
+      a:hover {
+        box-shadow: 0 1px 0px 0;
+      }
+    </style>
+    <article>
+      <header>
+        <h1>Interest in 'Flat Earth' is growing among Americans</h1>
+      </header>
+      <section>
+        <p>Here are the moments in pop culture that gave this bizarre (and false) theory a boost.</p>
+      </section>
+      <figure>
+        <daticle-flat-earthers-chart></daticle-flat-earthers-chart>
+        <figcaption>The interest level of 'flat earth' in United States according to Google Trends.
+          <br>The interest level represents search interest relative to the highest point on the chart for the given region and
+          time. A value of 100 is the peak popularity for the term.
+        </figcaption>
+      </figure>
+      <section>
+        <p>
+          <b>January 24th, 2016</b>
+          <br>Rapper B.o.B. sparked an
+          <a href="https://twitter.com/bobatl/status/691411463051804676?ref_src=twsrc%5Etfw" target="_blank">argument on Twitter</a> about the shape of the Earth. He claimed that the curvature of the earth would be more
+          visible to the human eye. He also launched a crowd-funding campaign to send tiny satellites into space to disprove
+          what we have known for centuries.
+        </p>
+      </section>
+      <section>
+        <p>
+          <b>February 17th, 2017</b>
+          <br>In a podcast, NBA all-star Kyrie Irwing came out as a flat-earther. “The Earth is flat”, he said, and then explained:
+          "If you really think about it from a landscape of the way we travel, the way we move and the fact that — can you
+          really think of us rotating around the sun, and all the planets align, rotating in specific dates, being perpendicular
+          with what’s going on with these planets and stuff like this"
+        </p>
+      </section>
+      <section>
+        <p>
+          <b>March 18th, 2017</b>
+          <br>Shaquille O’Neal proclaimed the flatness of earth on his podcast. A few days later he said he was just trolling.
+          (Aren't we all?)
+        </p>
+      </section>
+      <section>
+        <p>
+          <b>August 21, 2017</b>
+          <br>North America was treated to a total solar eclipse. Flat earthers took the opportunity to explain how the eclipse
+          is a clear proof that the Earth is flat. Read about it
+          <a href="https://www.forbes.com/sites/trevornace/2017/08/22/flat-earthers-declare-solar-eclipse-just-proved-earth-flat/#4114124e6921"
+            target="_blank">in this Forbes story.</a>
+        </p>
+      </section>
+      <section>
+        <p>
+          <b>November 21st, 2017</b>
+          <br>Mike Hughes announced his intention to launch himself into space in his home made rocket. His goal is to be miles
+          above the earth where he would photograph the planet and prove once and for all that the earth is flat (It is not!).
+          <a target="_blank" href="https://www.washingtonpost.com/news/speaking-of-science/wp/2017/11/21/this-man-is-about-to-launch-himself-in-his-homemade-rocket-to-prove-the-earth-is-flat/?utm_term=.bc85b9577888">
+            Read more.
+          </a>
+        </p>
+      </section>
+      <section></section>
+    </article>
+
+  </template>
+
+  <script>
+    class DaticleFlatEarthers extends Polymer.Element {
+      static get is() { return 'daticle-flat-earthers'; }
+    }
+
+    window.customElements.define(DaticleFlatEarthers.is, DaticleFlatEarthers);
+  </script>
+</dom-module>
